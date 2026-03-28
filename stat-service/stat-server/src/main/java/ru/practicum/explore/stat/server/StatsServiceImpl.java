@@ -18,9 +18,8 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     @Transactional
-    public String saveHit(EndpointHitDto hitDto) {
+    public void saveHit(EndpointHitDto hitDto) {
         repository.save(StatsMapper.mapDtoToEndpointHit(hitDto));
-        return "Информация сохранена";
     }
 
     @Override
@@ -29,7 +28,7 @@ public class StatsServiceImpl implements StatsService {
             throw new IllegalArgumentException("Дата начала не может быть раньше даты окончания");
         }
 
-        if (uris == null || uris.isEmpty()){
+        if (uris == null || uris.isEmpty()) {
             return unique ?
                     repository.findAllStatsUniqueIp(start, end) : repository.findAllStats(start, end);
         } else {

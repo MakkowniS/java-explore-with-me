@@ -5,7 +5,7 @@ import ru.practicum.explore.stat.server.model.EndpointHit;
 
 public class StatsMapper {
 
-    public static EndpointHit mapDtoToEndpointHit(EndpointHitDto hitDto){
+    public static EndpointHit mapDtoToEndpointHit(EndpointHitDto hitDto) {
         return EndpointHit.builder()
                 .app(hitDto.getApp())
                 .uri(hitDto.getUri())
