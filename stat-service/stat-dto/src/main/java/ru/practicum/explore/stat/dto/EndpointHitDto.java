@@ -28,7 +28,7 @@ public class EndpointHitDto {
     private String ip; // IP адрес, кто осуществил запрос
 
     @NotNull
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp; // Дата и время создания запроса
 
 }
