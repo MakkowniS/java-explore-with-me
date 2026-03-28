@@ -1,5 +1,6 @@
 package ru.practicum.explore.stat.server;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,7 +20,7 @@ public class StatsController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public void hit(@RequestBody EndpointHitDto hitDto){
+    public void hit(@Valid @RequestBody EndpointHitDto hitDto){
         log.info("Сохранение Hit для URI: {}", hitDto.getUri());
         service.saveHit(hitDto);
     }
