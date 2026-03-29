@@ -19,6 +19,7 @@
 
 	<modules>
 		<module>stat-service</module>
+		<module>main-service</module>
 	</modules>
 
 	<properties>

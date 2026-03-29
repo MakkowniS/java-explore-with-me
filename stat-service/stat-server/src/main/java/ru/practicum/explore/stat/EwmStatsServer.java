@@ -1,4 +1,4 @@
-package ru.practicum.explore.stat.server;
+package ru.practicum.explore.stat;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
