@@ -2,6 +2,7 @@ package ru.practicum.explore.main.user;
 
 import ru.practicum.explore.main.user.dto.NewUserRequest;
 import ru.practicum.explore.main.user.dto.UserDto;
+import ru.practicum.explore.main.user.dto.UserShortDto;
 import ru.practicum.explore.main.user.model.User;
 
 public class UserMapper {
@@ -18,6 +19,13 @@ public class UserMapper {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .build();
+    }
+
+    public static UserShortDto mapToUserShortDto(User user){
+        return UserShortDto.builder()
+                .id(user.getId())
+                .name(user.getName())
                 .build();
     }
 

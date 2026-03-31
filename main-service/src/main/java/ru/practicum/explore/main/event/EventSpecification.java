@@ -1,0 +1,42 @@
+package ru.practicum.explore.main.event;
+
+import org.springframework.data.jpa.domain.Specification;
+import ru.practicum.explore.main.event.model.Event;
+import ru.practicum.explore.main.event.model.EventState;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class EventSpecification {
+
+    public static Specification<Event> hasUsers(List<Long> userIds) {
+        return ((root, query, cb) -> userIds == null || userIds.isEmpty()
+                ? cb.conjunction()
+                : root.get("initiator").get("id").in(userIds));
+    }
+
+    public static Specification<Event> hasStates(List<EventState> states) {
+        return (root, query, cb) -> states == null || states.isEmpty()
+                ? cb.conjunction()
+                : root.get("state").in(states);
+    }
+
+    public static Specification<Event> hasCategories(List<Long> categories) {
+        return (root, query, cb) -> categories == null || categories.isEmpty()
+                ? cb.conjunction()
+                : root.get("category").get("id").in(categories);
+    }
+
+    public static Specification<Event> isAfterStart(LocalDateTime start) {
+        return (root, query, cb) -> start == null
+                ? cb.conjunction()
+                : cb.greaterThanOrEqualTo(root.get("eventDate"), start);
+    }
+
+    public static Specification<Event> isBeforeEnd(LocalDateTime end) {
+        return (root, query, cb) -> end == null
+                ? cb.conjunction()
+                : cb.lessThanOrEqualTo(root.get("eventDate"), end);
+    }
+
+}
