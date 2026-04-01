@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.explore.main.error.model.ApiError;
 import ru.practicum.explore.main.error.model.exception.NotFoundException;
+import ru.practicum.explore.main.error.model.exception.DeniedAccessException;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
@@ -47,7 +46,19 @@ public class ErrorHandler {
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST.name())
                 .reason("Incorrectly made request.")
-                .message(e.getLocalizedMessage())
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    // 403 Ошибка доступа
+    @ExceptionHandler(DeniedAccessException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleTypeMismatch(DeniedAccessException e) {
+        return ApiError.builder()
+                .status(HttpStatus.FORBIDDEN.name())
+                .reason("Access Denied.")
+                .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
     }

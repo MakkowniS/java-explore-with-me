@@ -1,4 +1,4 @@
-package ru.practicum.explore.main.event.dto;
+package ru.practicum.explore.main.event.dto.updateRequest;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Size;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateEventAdminRequest {
+public class UpdateEventRequest {
 
     @Size(min = 20, max = 2000)
     private String annotation;
