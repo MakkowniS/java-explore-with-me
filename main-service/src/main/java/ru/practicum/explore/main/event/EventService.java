@@ -1,10 +1,14 @@
 package ru.practicum.explore.main.event;
 
+import jakarta.servlet.http.HttpServletRequest;
 import ru.practicum.explore.main.event.dto.EventFullDto;
 import ru.practicum.explore.main.event.dto.EventShortDto;
 import ru.practicum.explore.main.event.dto.NewEventDto;
 import ru.practicum.explore.main.event.dto.updateRequest.UpdateEventRequest;
 import ru.practicum.explore.main.event.model.EventState;
+import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateResult;
+import ru.practicum.explore.main.request.dto.ParticipationRequestDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,4 +28,16 @@ public interface EventService {
     List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size);
 
     EventFullDto getUserEventById(Long userId, Long eventId);
+
+    List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
+                                        LocalDateTime rangeStart, LocalDateTime rangeEnd,
+                                        Boolean onlyAvailable, String sort,
+                                        int from, int size, HttpServletRequest request);
+
+    EventFullDto getEventByIdPublic(Long eventId, HttpServletRequest request);
+
+    EventRequestStatusUpdateResult updateRequestStatus(Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequest);
+
+    List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId);
+
 }

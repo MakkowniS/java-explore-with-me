@@ -1,7 +1,10 @@
 package ru.practicum.explore.main.event;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,14 @@ import ru.practicum.explore.main.event.model.Event;
 import ru.practicum.explore.main.event.model.EventState;
 import ru.practicum.explore.main.event.model.Location;
 import ru.practicum.explore.main.event.model.StateAction;
+import ru.practicum.explore.main.request.RequestMapper;
+import ru.practicum.explore.main.request.RequestRepository;
+import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateResult;
+import ru.practicum.explore.main.request.dto.ParticipationRequestDto;
+import ru.practicum.explore.main.request.model.ParticipationRequest;
+import ru.practicum.explore.main.request.model.RequestStatus;
+import ru.practicum.explore.main.stats.StatsClientService;
 import ru.practicum.explore.main.user.UserRepository;
 import ru.practicum.explore.main.user.model.User;
 
@@ -33,6 +44,8 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final StatsClientService statsClientService;
+    private final RequestRepository requestRepository;
 
     // Admin
     @Override
@@ -153,7 +166,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size) {
-        PageRequest pageRequest = PageRequest.of(from / size, size);
+        Pageable pageRequest = PageRequest.of(from / size, size);
         List<Event> eventList = eventRepository.findAllByInitiatorId(userId, pageRequest);
         return eventList.stream()
                 .map(EventMapper::mapToEventShortDto)
@@ -166,6 +179,106 @@ public class EventServiceImpl implements EventService {
                 eventRepository.findByIdAndInitiatorId(eventId, userId)
                     .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"))
         );
+    }
+
+    // Public
+    @Override
+    public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, int from, int size, HttpServletRequest request) {
+        // Если дата начала не указана, берётся настоящая
+        LocalDateTime start = (rangeStart != null) ? rangeStart : LocalDateTime.now();
+
+        // Сборка спецификации
+        Specification<Event> spec = Specification.where(EventSpecification.isPublished())
+                .and(EventSpecification.textSearch(text))
+                .and(EventSpecification.hasCategories(categories))
+                .and(EventSpecification.isPaid(paid))
+                .and(EventSpecification.isAfterStart(start))
+                .and(EventSpecification.isBeforeEnd(rangeEnd))
+                .and(EventSpecification.isAvailable(onlyAvailable));
+
+        // Сортировка (EVENT_DATE или VIEWS)
+        Sort sorting = Sort.unsorted();
+        if (sort != null) {
+            if (sort.equalsIgnoreCase("EVENT_DATE")){
+                sorting = Sort.by(Sort.Direction.ASC, "eventDate");
+            } else if (sort.equalsIgnoreCase("VIEWS")){
+                sorting = Sort.by(Sort.Direction.DESC, "views");
+            }
+        }
+
+        Pageable pageable = PageRequest.of(from / size, size, sorting);
+
+        // Запрос
+        List<Event> events = eventRepository.findAll(spec, pageable).getContent();
+
+        // Отправка статистики
+        statsClientService.sendHit(request);
+
+        return events.stream()
+                .map(EventMapper::mapToEventShortDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EventFullDto getEventByIdPublic(Long eventId, HttpServletRequest request) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new NotFoundException("Event with id=" + eventId + " was not found");
+        }
+
+        statsClientService.sendHit(request);
+
+        return EventMapper.mapToEventFullDto(event);
+    }
+
+    @Override
+    @Transactional
+    public EventRequestStatusUpdateResult updateRequestStatus(Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequest) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+
+        List<ParticipationRequest> requests = requestRepository.findAllByIdIn(updateRequest.getRequestIds());
+
+        EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
+
+        for (ParticipationRequest req : requests) {
+            if (updateRequest.getStatus() == RequestStatus.CONFIRMED) {
+                if (event.getParticipantLimit() != 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
+                    throw new ConflictException("Лимит участников исчерпан");
+                }
+                req.setStatus(RequestStatus.CONFIRMED);
+                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+                result.getConfirmedRequests().add(RequestMapper.mapToRequestDto(req));
+            } else {
+                req.setStatus(RequestStatus.REJECTED);
+                result.getRejectedRequests().add(RequestMapper.mapToRequestDto(req));
+            }
+        }
+
+        eventRepository.save(event);
+        requestRepository.saveAll(requests);
+        return result;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+
+        // Проверяем, что запрашивающий — это автор события
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new ConflictException("Только инициатор события может просматривать запросы на участие.");
+        }
+
+        // Получаем все запросы для этого события
+        List<ParticipationRequest> requests = requestRepository.findAllByEventId(eventId);
+
+        return requests.stream()
+                .map(RequestMapper::mapToRequestDto)
+                .collect(Collectors.toList());
     }
 
     // Вспомогательный метод

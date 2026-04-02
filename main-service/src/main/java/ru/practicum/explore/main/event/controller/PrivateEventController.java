@@ -12,6 +12,9 @@ import ru.practicum.explore.main.event.dto.EventFullDto;
 import ru.practicum.explore.main.event.dto.EventShortDto;
 import ru.practicum.explore.main.event.dto.NewEventDto;
 import ru.practicum.explore.main.event.dto.updateRequest.UpdateEventRequest;
+import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateResult;
+import ru.practicum.explore.main.request.dto.ParticipationRequestDto;
 
 import java.util.List;
 
@@ -47,5 +50,22 @@ public class PrivateEventController {
     @GetMapping("/{eventId}")
     public EventFullDto getUserEventById(@PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.getUserEventById(userId, eventId);
+    }
+
+    // Получить информацию о запросах на участие в событии текущего пользователя
+    @GetMapping("/{eventId}/requests")
+    public List<ParticipationRequestDto> getEventRequests(
+            @PathVariable Long userId,
+            @PathVariable Long eventId) {
+        return eventService.getEventRequests(userId, eventId);
+    }
+
+    // Изменить статус (подтвердить, отменить) заявок на участие в событии текущего пользователя
+    @PatchMapping("/{eventId}/requests")
+    public EventRequestStatusUpdateResult updateRequestStatus(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @Valid @RequestBody EventRequestStatusUpdateRequest updateRequest) {
+        return eventService.updateRequestStatus(userId, eventId, updateRequest);
     }
 }

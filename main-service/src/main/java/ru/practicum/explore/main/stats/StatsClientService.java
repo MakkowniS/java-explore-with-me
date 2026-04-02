@@ -29,7 +29,7 @@ public class StatsClientService {
         try {
             statsClient.saveHit(endpointHitDto);
         } catch (Exception e) {
-            log.error("Ошибка при отправке статистики в фоновом режиме: {}", e.getMessage());
+            log.error("Ошибка при отправке статистики: {}", e.getMessage());
         }
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import ru.practicum.explore.main.error.model.ApiError;
 import ru.practicum.explore.main.error.model.exception.NotFoundException;
 import ru.practicum.explore.main.error.model.exception.DeniedAccessException;
+import ru.practicum.explore.main.error.model.exception.ValidationException;
 
 import java.time.LocalDateTime;
 
@@ -47,6 +48,19 @@ public class ErrorHandler {
                 .status(HttpStatus.BAD_REQUEST.name())
                 .reason("Incorrectly made request.")
                 .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    // 400 Ошибка валидации 2
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleValidationException(ValidationException e) {
+        log.error("400: Validation error: {}", e.getMessage());
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST.name())
+                .reason("Incorrectly made request.")
+                .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
     }

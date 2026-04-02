@@ -1,6 +1,7 @@
 package ru.practicum.explore.main.event;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import ru.practicum.explore.main.event.model.Event;
@@ -12,6 +13,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     Optional<Event> findByIdAndInitiatorId(long eventId, long userId);
 
-    List<Event> findAllByInitiatorId(long userId, PageRequest pageRequest);
+    List<Event> findAllByInitiatorId(long userId, Pageable pageable);
 
 }

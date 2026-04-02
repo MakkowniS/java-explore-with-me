@@ -9,6 +9,18 @@ import java.util.List;
 
 public class EventSpecification {
 
+    // Текстовый поиск
+    public static Specification<Event> textSearch(String text) {
+        return (root, query, cb) -> {
+            if (text == null || text.isEmpty()) return cb.conjunction();
+            String search = "%" + text.toLowerCase() + "%";
+            return cb.or(
+                    cb.like(cb.lower(root.get("annotation")), search),
+                    cb.like(cb.lower(root.get("description")), search)
+            );
+        };
+    }
+
     public static Specification<Event> hasUsers(List<Long> userIds) {
         return ((root, query, cb) -> userIds == null || userIds.isEmpty()
                 ? cb.conjunction()
@@ -25,6 +37,28 @@ public class EventSpecification {
         return (root, query, cb) -> categories == null || categories.isEmpty()
                 ? cb.conjunction()
                 : root.get("category").get("id").in(categories);
+    }
+
+    public static Specification<Event> isPaid(Boolean paid) {
+        return (root, query, cb) -> paid == null
+                ? cb.conjunction()
+                : cb.equal(root.get("paid"), paid);
+    }
+
+    // Опубликованные
+    public static Specification<Event> isPublished(){
+        return (root, query, cb) -> cb.equal(root.get("state"), EventState.PUBLISHED);
+    }
+
+    // Фильтр по доступности
+    public static Specification<Event> isAvailable(Boolean onlyAvailable) {
+        return (root, query, cb) -> {
+            if (onlyAvailable == null || !onlyAvailable) return cb.conjunction();
+            return cb.or(
+                    cb.equal(root.get("participantLimit"), 0),
+                    cb.lessThan(root.get("confirmedRequests"), root.get("participantLimit"))
+            );
+        };
     }
 
     public static Specification<Event> isAfterStart(LocalDateTime start) {
