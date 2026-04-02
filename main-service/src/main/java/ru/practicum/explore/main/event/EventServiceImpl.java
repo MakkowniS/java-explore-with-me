@@ -58,7 +58,7 @@ public class EventServiceImpl implements EventService {
                 .and(EventSpecification.isAfterStart(rangeStart))
                 .and(EventSpecification.isBeforeEnd(rangeEnd));
 
-        PageRequest pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from / size, size);
 
         List<Event> events = eventRepository.findAll(spec, pageable).getContent();
 

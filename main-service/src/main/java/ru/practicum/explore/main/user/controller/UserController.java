@@ -1,4 +1,4 @@
-package ru.practicum.explore.main.user;
+package ru.practicum.explore.main.user.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore.main.user.UserService;
 import ru.practicum.explore.main.user.dto.NewUserRequest;
 import ru.practicum.explore.main.user.dto.UserDto;
 

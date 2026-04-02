@@ -9,8 +9,6 @@ import ru.practicum.explore.main.error.model.exception.NotFoundException;
 import ru.practicum.explore.main.event.EventRepository;
 import ru.practicum.explore.main.event.model.Event;
 import ru.practicum.explore.main.event.model.EventState;
-import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateRequest;
-import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.explore.main.request.dto.ParticipationRequestDto;
 import ru.practicum.explore.main.request.model.ParticipationRequest;
 import ru.practicum.explore.main.request.model.RequestStatus;
@@ -19,7 +17,6 @@ import ru.practicum.explore.main.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
