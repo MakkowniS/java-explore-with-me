@@ -1,6 +1,7 @@
-package ru.practicum.explore.main.event.dto.updateRequest;
+package ru.practicum.explore.main.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +29,10 @@ public class UpdateEventRequest {
 
     private Location location;
     private Boolean paid;
+
+    @PositiveOrZero
     private Integer participantLimit;
+
     private Boolean requestModeration;
 
     private StateAction stateAction; // PUBLISH_EVENT или REJECT_EVENT

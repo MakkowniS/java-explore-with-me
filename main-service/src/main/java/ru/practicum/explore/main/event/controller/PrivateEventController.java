@@ -11,7 +11,7 @@ import ru.practicum.explore.main.event.EventService;
 import ru.practicum.explore.main.event.dto.EventFullDto;
 import ru.practicum.explore.main.event.dto.EventShortDto;
 import ru.practicum.explore.main.event.dto.NewEventDto;
-import ru.practicum.explore.main.event.dto.updateRequest.UpdateEventRequest;
+import ru.practicum.explore.main.event.dto.UpdateEventRequest;
 import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.explore.main.request.dto.ParticipationRequestDto;

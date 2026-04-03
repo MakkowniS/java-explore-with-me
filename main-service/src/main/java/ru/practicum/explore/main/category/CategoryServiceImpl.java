@@ -7,7 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore.main.category.dto.CategoryDto;
 import ru.practicum.explore.main.category.dto.NewCategoryDto;
 import ru.practicum.explore.main.category.model.Category;
+import ru.practicum.explore.main.error.model.exception.ConflictException;
 import ru.practicum.explore.main.error.model.exception.NotFoundException;
+import ru.practicum.explore.main.event.EventRepository;
+import ru.practicum.explore.main.event.model.Event;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     //Admin
     @Override
@@ -42,7 +46,11 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(categoryId)) {
             throw new NotFoundException("Category with id=" + categoryId + " was not found");
         }
-        categoryRepository.deleteById(categoryId); // Добавить проверку есть ли события с этой категорией
+        if (eventRepository.existsByCategoryId(categoryId)) {
+            throw new ConflictException("Category with id=" + categoryId + " cannot be deleted.");
+        }
+
+        categoryRepository.deleteById(categoryId);
     }
 
     //Public

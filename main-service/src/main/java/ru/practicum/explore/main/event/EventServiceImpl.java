@@ -13,10 +13,11 @@ import ru.practicum.explore.main.category.model.Category;
 import ru.practicum.explore.main.error.model.exception.ConflictException;
 import ru.practicum.explore.main.error.model.exception.NotFoundException;
 import ru.practicum.explore.main.error.model.exception.DeniedAccessException;
+import ru.practicum.explore.main.error.model.exception.ValidationException;
 import ru.practicum.explore.main.event.dto.EventFullDto;
 import ru.practicum.explore.main.event.dto.EventShortDto;
 import ru.practicum.explore.main.event.dto.NewEventDto;
-import ru.practicum.explore.main.event.dto.updateRequest.UpdateEventRequest;
+import ru.practicum.explore.main.event.dto.UpdateEventRequest;
 import ru.practicum.explore.main.event.model.Event;
 import ru.practicum.explore.main.event.model.EventState;
 import ru.practicum.explore.main.event.model.Location;
@@ -33,6 +34,7 @@ import ru.practicum.explore.main.user.UserRepository;
 import ru.practicum.explore.main.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -148,7 +150,7 @@ public class EventServiceImpl implements EventService {
         // Проверка даты
         if (request.getEventDate() != null) {
             if (request.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-                throw new ConflictException("Дата и время намечающегося события не может быть раньше, чем через два часа от текущего момента.");
+                throw new ValidationException("Дата и время намечающегося события не может быть раньше, чем через два часа от текущего момента.");
             }
         }
 
@@ -213,9 +215,14 @@ public class EventServiceImpl implements EventService {
 
         // Отправка статистики
         statsClientService.sendHit(request);
+        events.forEach(event -> eventRepository.incrementViews(event.getId()));
 
         return events.stream()
-                .map(EventMapper::mapToEventShortDto)
+                .map(event -> {
+                    EventShortDto dto = EventMapper.mapToEventShortDto(event);
+                    dto.setViews(dto.getViews() + 1);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -226,6 +233,11 @@ public class EventServiceImpl implements EventService {
 
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Event with id=" + eventId + " was not found");
+        }
+
+        if (statsClientService.isNewUniqueVisit(request)){
+            eventRepository.incrementViews(eventId);
+            event.setViews(event.getViews() + 1);
         }
 
         statsClientService.sendHit(request);
