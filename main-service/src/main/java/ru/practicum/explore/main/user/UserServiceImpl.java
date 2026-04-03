@@ -19,6 +19,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Override
     public List<UserDto> getUsers(List<Long> ids, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<User> users;
@@ -30,10 +31,14 @@ public class UserServiceImpl implements UserService {
         return users.stream().map(UserMapper::mapToUserDto).collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
     public UserDto addUser(NewUserRequest newUserRequest) {
         return UserMapper.mapToUserDto(userRepository.save(UserMapper.mapToUser(newUserRequest)));
     }
 
+    @Override
+    @Transactional
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("User with id=" + userId + " was not found");
