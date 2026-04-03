@@ -10,7 +10,6 @@ import ru.practicum.explore.main.category.model.Category;
 import ru.practicum.explore.main.error.model.exception.ConflictException;
 import ru.practicum.explore.main.error.model.exception.NotFoundException;
 import ru.practicum.explore.main.event.EventRepository;
-import ru.practicum.explore.main.event.model.Event;
 
 import java.util.List;
 import java.util.stream.Collectors;

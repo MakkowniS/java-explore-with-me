@@ -34,7 +34,6 @@ import ru.practicum.explore.main.user.UserRepository;
 import ru.practicum.explore.main.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -235,7 +234,7 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Event with id=" + eventId + " was not found");
         }
 
-        if (statsClientService.isNewUniqueVisit(request)){
+        if (statsClientService.isNewUniqueVisit(request)) {
             eventRepository.incrementViews(eventId);
             event.setViews(event.getViews() + 1);
         }
