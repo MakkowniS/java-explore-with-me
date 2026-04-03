@@ -6,14 +6,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import ru.practicum.explore.main.event.model.Event;
 import ru.practicum.explore.stat.client.StatsClient;
 import ru.practicum.explore.stat.dto.EndpointHitDto;
 import ru.practicum.explore.stat.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +27,6 @@ public class StatsClientService {
     private final StatsClient statsClient;
     private final ObjectMapper objectMapper;
 
-    @Async
     public void sendHit(HttpServletRequest request) {
         log.info("Отправка статистики для URI: {}", request.getRequestURI());
         EndpointHitDto endpointHitDto = EndpointHitDto.builder()
@@ -39,27 +42,50 @@ public class StatsClientService {
         }
     }
 
-    public boolean isNewUniqueVisit(HttpServletRequest request) {
-        LocalDateTime start = LocalDateTime.now().minusYears(15);
+    // Ключ — это ID события, а значение — количество уникальных хитов
+    public Map<Long, Long> getViews(List<Event> events) {
+        if (events == null || events.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        // Формируем список URI для запроса
+        List<String> uris = events.stream()
+                .map(event -> "/events/" + event.getId())
+                .collect(Collectors.toList());
+
+        // Ищем самую раннюю дату создания среди всех переданных событий
+        LocalDateTime start = events.stream()
+                .map(Event::getCreatedOn)
+                .min(LocalDateTime::compareTo)
+                .orElse(LocalDateTime.now().minusYears(15));
+
+        // Окончание текущее время
         LocalDateTime end = LocalDateTime.now().plusMinutes(1);
-        List<String> uris = List.of(request.getRequestURI());
-        Boolean unique = true;
+
+        Map<Long, Long> viewsMap = new HashMap<>();
 
         try {
-            ResponseEntity<Object> response = statsClient.getStats(start, end, uris, unique);
+            // Отправляем запрос в сервис статистики unique = true
+            ResponseEntity<Object> response = statsClient.getStats(start, end, uris, true);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 List<ViewStatsDto> stats = objectMapper.convertValue(
                         response.getBody(),
                         new TypeReference<List<ViewStatsDto>>() {}
                 );
-                return stats.isEmpty();
-            }
 
+                // Преобразуем ответ в Map<eventId, hits>
+                for (ViewStatsDto stat : stats) {
+                    String uri = stat.getUri();
+                    // Извлекаем ID из конца строки URI
+                        String idStr = uri.substring(uri.lastIndexOf("/") + 1);
+                        Long eventId = Long.parseLong(idStr);
+                        viewsMap.put(eventId, stat.getHits());
+                }
+            }
         } catch (Exception e) {
-            log.error("Ошибка при проверке уникальности визита: {}", e.getMessage());
-            return false;
+            log.error("Ошибка при получении статистики просмотров от stats-server: {}", e.getMessage());
         }
-        return false;
+        return viewsMap;
     }
 }

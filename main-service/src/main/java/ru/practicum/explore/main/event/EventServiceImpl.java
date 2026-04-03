@@ -35,6 +35,7 @@ import ru.practicum.explore.main.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -214,16 +215,16 @@ public class EventServiceImpl implements EventService {
 
         // Отправка статистики
         statsClientService.sendHit(request);
-        events.stream()
-                .forEach(event -> eventRepository.incrementViews(event.getId()));
 
-        return events.stream()
-                .map(event -> {
-                    EventShortDto dto = EventMapper.mapToEventShortDto(event);
-                    dto.setViews(dto.getViews() + 1);
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        List<EventShortDto> dtos = events.stream()
+                .map(EventMapper::mapToEventShortDto)
+                .toList();
+
+        Map<Long, Long> viewsMap = statsClientService.getViews(events);
+
+        dtos.forEach(dto -> dto.setViews(viewsMap.getOrDefault(dto.getViews(), 0L)));
+
+        return dtos;
     }
 
     @Override
@@ -235,14 +236,15 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Event with id=" + eventId + " was not found");
         }
 
-        if (statsClientService.isNewUniqueVisit(request)) {
-            eventRepository.incrementViews(eventId);
-            event.setViews(event.getViews() + 1);
-        }
-
         statsClientService.sendHit(request);
 
-        return EventMapper.mapToEventFullDto(event);
+        Map<Long, Long> viewsMap = statsClientService.getViews(List.of(event));
+        Long views = viewsMap.getOrDefault(eventId, 0L);
+
+        EventFullDto dto = EventMapper.mapToEventFullDto(event);
+        dto.setViews(views);
+
+        return dto;
     }
 
     @Override

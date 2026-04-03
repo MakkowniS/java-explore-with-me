@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class EventRequestStatusUpdateResult {
-    List<ParticipationRequestDto> confirmedRequests;
-    List<ParticipationRequestDto> rejectedRequests;
+    private List<ParticipationRequestDto> confirmedRequests = new ArrayList<>(); // Инициализация
+    private List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
 }
