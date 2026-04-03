@@ -170,6 +170,11 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size) {
         Pageable pageRequest = PageRequest.of(from / size, size);
         List<Event> eventList = eventRepository.findAllByInitiatorId(userId, pageRequest);
+
+        Map<Long, Long> viewsMap = statsClientService.getViews(eventList);
+
+
+
         return eventList.stream()
                 .map(EventMapper::mapToEventShortDto)
                 .collect(Collectors.toList());
@@ -177,10 +182,16 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getUserEventById(Long userId, Long eventId) {
-        return EventMapper.mapToEventFullDto(
-                eventRepository.findByIdAndInitiatorId(eventId, userId)
-                        .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"))
-        );
+        Event event = eventRepository.findByIdAndInitiatorId(eventId,userId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+
+        Map<Long, Long> viewsMap = statsClientService.getViews(List.of(event));
+        Long views = viewsMap.getOrDefault(event.getId(), 0L);
+
+        EventFullDto eventFullDto = EventMapper.mapToEventFullDto(event);
+        eventFullDto.setViews(views);
+
+        return eventFullDto;
     }
 
     // Public
@@ -222,7 +233,13 @@ public class EventServiceImpl implements EventService {
 
         Map<Long, Long> viewsMap = statsClientService.getViews(events);
 
-        dtos.forEach(dto -> dto.setViews(viewsMap.getOrDefault(dto.getViews(), 0L)));
+        dtos.forEach(dto -> {
+            Long views = viewsMap.getOrDefault(dto.getId(), 0L);
+            if (dto.getViews() < views) {
+                eventRepository.incrementViews(dto.getId(), views);
+                dto.setViews(views);
+            }
+        });
 
         return dtos;
     }
@@ -240,9 +257,12 @@ public class EventServiceImpl implements EventService {
 
         Map<Long, Long> viewsMap = statsClientService.getViews(List.of(event));
         Long views = viewsMap.getOrDefault(eventId, 0L);
-
         EventFullDto dto = EventMapper.mapToEventFullDto(event);
-        dto.setViews(views);
+
+        if (event.getViews() < views) {
+            eventRepository.incrementViews(eventId, views);
+            dto.setViews(views);
+        };
 
         return dto;
     }

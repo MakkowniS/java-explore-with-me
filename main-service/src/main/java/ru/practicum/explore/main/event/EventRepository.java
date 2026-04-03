@@ -19,8 +19,8 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     @Modifying
     @Transactional
-    @Query("UPDATE Event e SET e.views = e.views + 1 WHERE e.id = :eventId")
-    void incrementViews(Long eventId);
+    @Query("UPDATE Event e SET e.views = :views WHERE e.id = :eventId")
+    void incrementViews(Long eventId, Long views);
 
     boolean existsByCategoryId(Long categoryId);
 }

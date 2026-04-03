@@ -65,8 +65,8 @@ public class   Event {
     @Column(name = "title", nullable = false, length = 120)
     private String title; // Заголовок
 
-    @Column(name = "views")
-    private Long views; // Количество просмотров
+    @Column
+    private Long views;
 
     @Column(name = "confirmed_requests")
     private Integer confirmedRequests; // Количество одобренных заявок
