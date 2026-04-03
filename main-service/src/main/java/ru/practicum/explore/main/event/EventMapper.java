@@ -9,7 +9,7 @@ import ru.practicum.explore.main.user.UserMapper;
 
 public class EventMapper {
 
-    public static EventFullDto mapToEventFullDto(Event event){
+    public static EventFullDto mapToEventFullDto(Event event) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -30,7 +30,7 @@ public class EventMapper {
                 .build();
     }
 
-    public static Event mapToEvent(NewEventDto newEventDto){
+    public static Event mapToEvent(NewEventDto newEventDto) {
         return Event.builder()
                 .annotation(newEventDto.getAnnotation())
                 .description(newEventDto.getDescription())
@@ -43,7 +43,7 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventShortDto mapToEventShortDto(Event event){
+    public static EventShortDto mapToEventShortDto(Event event) {
         return EventShortDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())

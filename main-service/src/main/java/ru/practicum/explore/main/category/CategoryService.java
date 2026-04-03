@@ -9,11 +9,14 @@ public interface CategoryService {
 
     //Admin
     CategoryDto addCategory(NewCategoryDto newCategoryDto);
+
     CategoryDto updateCategory(Long categoryId, NewCategoryDto newCategoryDto);
+
     void deleteCategory(Long categoryId);
 
     //Public
     List<CategoryDto> getCategories(int from, int size);
+
     CategoryDto getCategoryById(Long categoryId);
 
 }

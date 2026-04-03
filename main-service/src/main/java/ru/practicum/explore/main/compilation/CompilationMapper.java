@@ -6,7 +6,7 @@ import ru.practicum.explore.main.event.EventMapper;
 
 public class CompilationMapper {
 
-    public static CompilationDto mapToCompilationDto(Compilation c){
+    public static CompilationDto mapToCompilationDto(Compilation c) {
         return CompilationDto.builder()
                 .id(c.getId())
                 .events(c.getEvents().stream().map(EventMapper::mapToEventShortDto).toList())

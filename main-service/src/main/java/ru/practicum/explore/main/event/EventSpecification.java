@@ -46,7 +46,7 @@ public class EventSpecification {
     }
 
     // Опубликованные
-    public static Specification<Event> isPublished(){
+    public static Specification<Event> isPublished() {
         return (root, query, cb) -> cb.equal(root.get("state"), EventState.PUBLISHED);
     }
 
@@ -72,5 +72,4 @@ public class EventSpecification {
                 ? cb.conjunction()
                 : cb.lessThanOrEqualTo(root.get("eventDate"), end);
     }
-
 }

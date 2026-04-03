@@ -75,8 +75,8 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
 
         // Валидация времени
-        if (request.getEventDate() != null){
-            if (request.getEventDate().isBefore(LocalDateTime.now().plusHours(1))){
+        if (request.getEventDate() != null) {
+            if (request.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
                 throw new ConflictException("Дата начала события должна быть не ранее чем за час от даты публикации.");
             }
         }
@@ -107,7 +107,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         // Проверка даты
-        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))){
+        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConflictException("Дата и время события не могут быть раньше, чем через 2 часа от текущего момента.");
         }
 
@@ -177,7 +177,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getUserEventById(Long userId, Long eventId) {
         return EventMapper.mapToEventFullDto(
                 eventRepository.findByIdAndInitiatorId(eventId, userId)
-                    .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"))
+                        .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"))
         );
     }
 
@@ -199,9 +199,9 @@ public class EventServiceImpl implements EventService {
         // Сортировка (EVENT_DATE или VIEWS)
         Sort sorting = Sort.unsorted();
         if (sort != null) {
-            if (sort.equalsIgnoreCase("EVENT_DATE")){
+            if (sort.equalsIgnoreCase("EVENT_DATE")) {
                 sorting = Sort.by(Sort.Direction.ASC, "eventDate");
-            } else if (sort.equalsIgnoreCase("VIEWS")){
+            } else if (sort.equalsIgnoreCase("VIEWS")) {
                 sorting = Sort.by(Sort.Direction.DESC, "views");
             }
         }

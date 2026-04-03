@@ -27,9 +27,7 @@ public class UserServiceImpl implements UserService {
         } else {
             users = userRepository.findAllByIdIn(ids, pageRequest);
         }
-        return users.stream()
-                .map(UserMapper::mapToUserDto)
-                .collect(Collectors.toList());
+        return users.stream().map(UserMapper::mapToUserDto).collect(Collectors.toList());
     }
 
     public UserDto addUser(NewUserRequest newUserRequest) {
@@ -38,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User with id="+userId+" was not found");
+            throw new NotFoundException("User with id=" + userId + " was not found");
         }
         userRepository.deleteById(userId);
     }
