@@ -171,10 +171,6 @@ public class EventServiceImpl implements EventService {
         Pageable pageRequest = PageRequest.of(from / size, size);
         List<Event> eventList = eventRepository.findAllByInitiatorId(userId, pageRequest);
 
-        Map<Long, Long> viewsMap = statsClientService.getViews(eventList);
-
-
-
         return eventList.stream()
                 .map(EventMapper::mapToEventShortDto)
                 .collect(Collectors.toList());
@@ -182,16 +178,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getUserEventById(Long userId, Long eventId) {
-        Event event = eventRepository.findByIdAndInitiatorId(eventId,userId)
-                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
-
-        Map<Long, Long> viewsMap = statsClientService.getViews(List.of(event));
-        Long views = viewsMap.getOrDefault(event.getId(), 0L);
-
-        EventFullDto eventFullDto = EventMapper.mapToEventFullDto(event);
-        eventFullDto.setViews(views);
-
-        return eventFullDto;
+        return EventMapper.mapToEventFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"))
+        );
     }
 
     // Public
@@ -262,7 +251,8 @@ public class EventServiceImpl implements EventService {
         if (event.getViews() < views) {
             eventRepository.incrementViews(eventId, views);
             dto.setViews(views);
-        };
+        }
+        ;
 
         return dto;
     }
