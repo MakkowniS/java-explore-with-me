@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.explore.main.error.model.ApiError;
+import ru.practicum.explore.main.error.model.exception.ConflictException;
 import ru.practicum.explore.main.error.model.exception.NotFoundException;
 import ru.practicum.explore.main.error.model.exception.DeniedAccessException;
 import ru.practicum.explore.main.error.model.exception.ValidationException;
@@ -111,6 +112,19 @@ public class ErrorHandler {
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT.name())
                 .reason("Integrity constraint has been violated.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    // 409 Conflict
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleConflict(final ConflictException e) {
+        log.error("409: Conflict: {}", e.getMessage());
+        return ApiError.builder()
+                .status(HttpStatus.CONFLICT.name())
+                .reason("Conflict has been violated.")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
