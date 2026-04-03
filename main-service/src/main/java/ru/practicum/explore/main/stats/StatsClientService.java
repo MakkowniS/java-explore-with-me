@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class StatsClientService {
 
-    private final StatsClient statsClient; // Тот самый клиент из библиотеки
+    private final StatsClient statsClient;
 
     @Async
     public void sendHit(HttpServletRequest request) {

@@ -7,7 +7,7 @@ services:
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U username -d stats" ]
+      test: [ "CMD-SHELL", "pg_isready -U username -d ewm-main" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -22,7 +22,7 @@ services:
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U username -d stats" ]
+      test: [ "CMD-SHELL", "pg_isready -U username -d ewm-stats" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -52,7 +52,7 @@ services:
       main-db:
         condition: service_healthy
       stats-server:
-        condition: service_healthy
+        condition: service_started
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/ewm-main
       - SPRING_DATASOURCE_USERNAME=username
