@@ -97,7 +97,7 @@ public class RequestServiceImpl implements RequestService {
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             eventRepository.save(event);
         }
-        request.setStatus(RequestStatus.CANCELLED);
+        request.setStatus(RequestStatus.CANCELED);
 
         return RequestMapper.mapToRequestDto(requestRepository.save(request));
     }

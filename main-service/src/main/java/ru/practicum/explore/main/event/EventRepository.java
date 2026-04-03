@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore.main.event.model.Event;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     List<Event> findAllByInitiatorId(long userId, Pageable pageable);
 
     @Modifying
+    @Transactional
     @Query("UPDATE Event e SET e.views = e.views + 1 WHERE e.id = :eventId")
     void incrementViews(Long eventId);
 

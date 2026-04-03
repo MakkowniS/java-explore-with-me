@@ -78,7 +78,7 @@ public class EventServiceImpl implements EventService {
         // Валидация времени
         if (request.getEventDate() != null) {
             if (request.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
-                throw new ConflictException("Дата начала события должна быть не ранее чем за час от даты публикации.");
+                throw new ValidationException("Дата начала события должна быть не ранее чем за час от даты публикации.");
             }
         }
 
@@ -109,7 +109,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         // Проверка даты
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ConflictException("Дата и время события не могут быть раньше, чем через 2 часа от текущего момента.");
+            throw new ValidationException("Дата и время события не могут быть раньше, чем через 2 часа от текущего момента.");
         }
 
         // Получаем юзера и категорию
@@ -214,7 +214,8 @@ public class EventServiceImpl implements EventService {
 
         // Отправка статистики
         statsClientService.sendHit(request);
-        events.forEach(event -> eventRepository.incrementViews(event.getId()));
+        events.stream()
+                .forEach(event -> eventRepository.incrementViews(event.getId()));
 
         return events.stream()
                 .map(event -> {
