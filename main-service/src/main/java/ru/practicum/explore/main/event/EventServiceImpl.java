@@ -268,6 +268,9 @@ public class EventServiceImpl implements EventService {
         EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
 
         for (ParticipationRequest req : requests) {
+            if (!req.getStatus().equals(RequestStatus.PENDING)){
+                throw new ConflictException("Статус можно изменить только у заявок, находящихся в состоянии PENDING");
+            }
             if (updateRequest.getStatus() == RequestStatus.CONFIRMED) {
                 if (event.getParticipantLimit() != 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
                     throw new ConflictException("Лимит участников исчерпан");
@@ -287,7 +290,6 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
