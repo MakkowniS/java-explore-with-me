@@ -18,7 +18,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     List<Event> findAllByInitiatorId(long userId, Pageable pageable);
 
     @Modifying(clearAutomatically = true)
-    @Transactional
     @Query("UPDATE Event e SET e.views = :views WHERE e.id = :eventId")
     void incrementViews(Long eventId, Long views);
 

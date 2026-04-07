@@ -185,6 +185,7 @@ public class EventServiceImpl implements EventService {
 
     // Public
     @Override
+    @Transactional
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, int from, int size, HttpServletRequest request) {
         // Если дата начала не указана, берётся настоящая
         LocalDateTime start = (rangeStart != null) ? rangeStart : LocalDateTime.now();
@@ -216,24 +217,13 @@ public class EventServiceImpl implements EventService {
         // Отправка статистики
         statsClientService.sendHit(request);
 
-        List<EventShortDto> dtos = events.stream()
+        return events.stream()
                 .map(EventMapper::mapToEventShortDto)
                 .toList();
-
-        Map<Long, Long> viewsMap = statsClientService.getViews(events);
-
-        dtos.forEach(dto -> {
-            Long views = viewsMap.getOrDefault(dto.getId(), 0L);
-            if (dto.getViews() < views) {
-                eventRepository.incrementViews(dto.getId(), views);
-                dto.setViews(views);
-            }
-        });
-
-        return dtos;
     }
 
     @Override
+    @Transactional
     public EventFullDto getEventByIdPublic(Long eventId, HttpServletRequest request) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
@@ -248,11 +238,12 @@ public class EventServiceImpl implements EventService {
         Long views = viewsMap.getOrDefault(eventId, 0L);
         EventFullDto dto = EventMapper.mapToEventFullDto(event);
 
+        if (views == 0) views = 1L;
+
         if (event.getViews() < views) {
             eventRepository.incrementViews(eventId, views);
             dto.setViews(views);
         }
-        ;
 
         return dto;
     }

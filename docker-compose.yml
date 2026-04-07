@@ -58,5 +58,4 @@ services:
       - SPRING_DATASOURCE_USERNAME=username
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=none
-
-
+      - STATS_SERVER_URL=http://stats-server:9090

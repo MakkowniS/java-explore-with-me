@@ -54,10 +54,7 @@ public class StatsClientService {
                 .collect(Collectors.toList());
 
         // Ищем самую раннюю дату создания среди всех переданных событий
-        LocalDateTime start = events.stream()
-                .map(Event::getCreatedOn)
-                .min(LocalDateTime::compareTo)
-                .orElse(LocalDateTime.now().minusYears(15));
+        LocalDateTime start = LocalDateTime.now().minusYears(10);
 
         // Окончание текущее время
         LocalDateTime end = LocalDateTime.now().plusMinutes(1);
@@ -86,6 +83,7 @@ public class StatsClientService {
         } catch (Exception e) {
             log.error("Ошибка при получении статистики просмотров от stats-server: {}", e.getMessage());
         }
+        log.info("Views map result: {}", viewsMap);
         return viewsMap;
     }
 }
