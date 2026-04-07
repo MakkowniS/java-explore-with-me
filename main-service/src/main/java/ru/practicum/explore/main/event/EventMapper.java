@@ -30,30 +30,11 @@ public class EventMapper {
     }
 
     public static Event mapToEvent(NewEventDto newEventDto) {
-        return Event.builder()
-                .annotation(newEventDto.getAnnotation())
-                .description(newEventDto.getDescription())
-                .eventDate(newEventDto.getEventDate())
-                .location(newEventDto.getLocation())
-                .paid(newEventDto.getPaid())
-                .participantLimit(newEventDto.getParticipantLimit())
-                .requestModeration(newEventDto.getRequestModeration())
-                .title(newEventDto.getTitle())
-                .build();
+        return Event.builder().annotation(newEventDto.getAnnotation()).description(newEventDto.getDescription()).eventDate(newEventDto.getEventDate()).location(newEventDto.getLocation()).paid(newEventDto.getPaid()).participantLimit(newEventDto.getParticipantLimit()).requestModeration(newEventDto.getRequestModeration()).title(newEventDto.getTitle()).build();
     }
 
     public static EventShortDto mapToEventShortDto(Event event) {
-        return EventShortDto.builder()
-                .id(event.getId())
-                .annotation(event.getAnnotation())
-                .category(CategoryMapper.mapToCategoryDto(event.getCategory()))
-                .confirmedRequests(event.getConfirmedRequests())
-                .eventDate(event.getEventDate())
-                .initiator(UserMapper.mapToUserShortDto(event.getInitiator()))
-                .paid(event.getPaid())
-                .title(event.getTitle())
-                .views(event.getViews())
-                .build();
+        return EventShortDto.builder().id(event.getId()).annotation(event.getAnnotation()).category(CategoryMapper.mapToCategoryDto(event.getCategory())).confirmedRequests(event.getConfirmedRequests()).eventDate(event.getEventDate()).initiator(UserMapper.mapToUserShortDto(event.getInitiator())).paid(event.getPaid()).title(event.getTitle()).views(event.getViews()).build();
     }
 
 }
