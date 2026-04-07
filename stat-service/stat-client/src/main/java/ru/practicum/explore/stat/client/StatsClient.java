@@ -27,7 +27,7 @@ public class StatsClient extends BaseClient {
     }
 
     public void saveHit(EndpointHitDto hitDto) {
-        post("/hits", hitDto);
+        post("/hit", hitDto);
     }
 
     public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {

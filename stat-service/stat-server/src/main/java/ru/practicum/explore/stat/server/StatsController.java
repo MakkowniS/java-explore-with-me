@@ -18,7 +18,7 @@ import java.util.List;
 public class StatsController {
     private final StatsService service;
 
-    @PostMapping("/hits")
+    @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public void hit(@Valid @RequestBody EndpointHitDto hitDto) {
         log.info("Сохранение Hit для URI: {}", hitDto.getUri());
