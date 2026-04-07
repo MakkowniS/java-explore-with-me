@@ -236,14 +236,13 @@ public class EventServiceImpl implements EventService {
 
         Map<Long, Long> viewsMap = statsClientService.getViews(List.of(event));
         Long views = viewsMap.getOrDefault(eventId, 0L);
-        EventFullDto dto = EventMapper.mapToEventFullDto(event);
-
         if (views == 0) views = 1L;
 
         if (event.getViews() < views) {
             eventRepository.incrementViews(eventId, views);
-            dto.setViews(views);
         }
+        EventFullDto dto = EventMapper.mapToEventFullDto(event);
+        dto.setViews(views);
 
         return dto;
     }
