@@ -68,16 +68,17 @@ public class StatsClientService {
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 List<ViewStatsDto> stats = objectMapper.convertValue(
                         response.getBody(),
-                        new TypeReference<List<ViewStatsDto>>() {}
+                        new TypeReference<List<ViewStatsDto>>() {
+                        }
                 );
 
                 // Преобразуем ответ в Map<eventId, hits>
                 for (ViewStatsDto stat : stats) {
                     String uri = stat.getUri();
                     // Извлекаем ID из конца строки URI
-                        String idStr = uri.substring(uri.lastIndexOf("/") + 1);
-                        Long eventId = Long.parseLong(idStr);
-                        viewsMap.put(eventId, stat.getHits());
+                    String idStr = uri.substring(uri.lastIndexOf("/") + 1);
+                    Long eventId = Long.parseLong(idStr);
+                    viewsMap.put(eventId, stat.getHits());
                 }
             }
         } catch (Exception e) {
