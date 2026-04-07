@@ -1,16 +1,16 @@
 package ru.practicum.explore.main.event;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import ru.practicum.explore.main.event.model.Event;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
+
+    @EntityGraph(attributePaths = {"category", "initiator"})
+    Optional<Event> findById(Long id);
 
     Optional<Event> findByIdAndInitiatorId(long eventId, long userId);
 
