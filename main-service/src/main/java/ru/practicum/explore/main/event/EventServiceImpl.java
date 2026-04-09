@@ -206,7 +206,12 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.findAll(spec, pageable).getContent();
 
         // Отправка статистики
-        statsClient.saveHit(request.getRequestURI(), request.getRemoteAddr());
+        try {
+            statsClient.saveHit(request.getRequestURI(), request.getRemoteAddr());
+        } catch (Exception e) {
+            log.error("Не удалось сохранить хит: {}", e.getMessage());
+        }
+
 
         Map<Long, Long> viewsMap = getViews(events);
 
@@ -240,7 +245,11 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Event with id=" + eventId + " was not found");
         }
 
-        statsClient.saveHit(request.getRequestURI(), request.getRemoteAddr());
+        try {
+            statsClient.saveHit(request.getRequestURI(), request.getRemoteAddr());
+        } catch (Exception e) {
+            log.error("Не удалось сохранить хит: {}", e.getMessage());
+        }
 
         Map<Long, Long> viewsMap = getViews(List.of(event));
         Long views = viewsMap.get(event.getId());

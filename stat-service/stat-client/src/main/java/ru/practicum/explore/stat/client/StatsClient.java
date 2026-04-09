@@ -34,9 +34,12 @@ public class StatsClient extends BaseClient {
     }
 
     public void saveHit(String uri, String ip) {
+
+        String safeUri = (uri.length() > 255) ? uri.substring(0, 255) : uri;
+
         EndpointHitDto hitDto = EndpointHitDto.builder()
                 .app(appName)
-                .uri(uri)
+                .uri(safeUri)
                 .ip(ip)
                 .timestamp(LocalDateTime.now())
                 .build();
