@@ -5,19 +5,17 @@ import ru.practicum.explore.main.event.dto.EventFullDto;
 import ru.practicum.explore.main.event.dto.EventShortDto;
 import ru.practicum.explore.main.event.dto.NewEventDto;
 import ru.practicum.explore.main.event.dto.UpdateEventRequest;
-import ru.practicum.explore.main.event.model.EventState;
+import ru.practicum.explore.main.event.dto.eventFilters.AdminEventFilter;
+import ru.practicum.explore.main.event.dto.eventFilters.PublicEventFilter;
 import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.explore.main.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.explore.main.request.dto.ParticipationRequestDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {
 
-    List<EventFullDto> getEventsAdmin(List<Long> users, List<EventState> states,
-                                      List<Long> categories, LocalDateTime rangeStart,
-                                      LocalDateTime rangeEnd, int from, int size);
+    List<EventFullDto> getEventsAdmin(AdminEventFilter filter);
 
     EventFullDto updateEventAdmin(Long eventId, UpdateEventRequest request);
 
@@ -29,10 +27,7 @@ public interface EventService {
 
     EventFullDto getUserEventById(Long userId, Long eventId);
 
-    List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
-                                        LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                        Boolean onlyAvailable, String sort,
-                                        int from, int size, HttpServletRequest request);
+    List<EventShortDto> getEventsPublic(PublicEventFilter filter, HttpServletRequest request);
 
     EventFullDto getEventByIdPublic(Long eventId, HttpServletRequest request);
 

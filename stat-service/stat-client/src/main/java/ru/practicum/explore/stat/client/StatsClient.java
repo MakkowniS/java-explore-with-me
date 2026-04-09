@@ -16,17 +16,30 @@ import java.util.Map;
 
 @Service
 public class StatsClient extends BaseClient {
+
+    private final String appName;
+
     @Autowired
-    public StatsClient(@Value("${stats.server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(@Value("${stats.server.url}") String serverUrl,
+                       // Читаем имя приложения из конфига. Если его нет, по дефолту будет ewm-main-service
+                       @Value("${spring.application.name:ewm-main-service}") String appName,
+                       RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                         .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
                         .build()
         );
+        this.appName = appName;
     }
 
-    public void saveHit(EndpointHitDto hitDto) {
+    public void saveHit(String uri, String ip) {
+        EndpointHitDto hitDto = EndpointHitDto.builder()
+                .app(appName)
+                .uri(uri)
+                .ip(ip)
+                .timestamp(LocalDateTime.now())
+                .build();
         post("/hit", hitDto);
     }
 
@@ -41,6 +54,4 @@ public class StatsClient extends BaseClient {
         );
         return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", params);
     }
-
-
 }
