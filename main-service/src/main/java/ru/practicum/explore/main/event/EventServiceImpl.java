@@ -218,17 +218,17 @@ public class EventServiceImpl implements EventService {
         List<EventShortDto> dtos = events.stream()
                 .map(event -> {
                     EventShortDto dto = EventMapper.mapToEventShortDto(event);
-                    dto.setViews(viewsMap.get(event.getId()));
+                    dto.setViews(viewsMap.getOrDefault(event.getId(), 0L));
                     return dto;
                 })
-                .toList();
+                .collect(Collectors.toList());
 
         // Сортировка (EVENT_DATE или VIEWS)
         if (filter.getSort() != null) {
             if (filter.getSort().equalsIgnoreCase("EVENT_DATE")) {
                 dtos.sort(Comparator.comparing(EventShortDto::getEventDate));
             } else if (filter.getSort().equalsIgnoreCase("VIEWS")) {
-                dtos.sort(Comparator.comparing(EventShortDto::getViews).reversed());
+                dtos.sort(Comparator.comparing(EventShortDto::getViews, Comparator.nullsLast(Comparator.reverseOrder())));
             }
         }
 
@@ -252,7 +252,7 @@ public class EventServiceImpl implements EventService {
         }
 
         Map<Long, Long> viewsMap = getViews(List.of(event));
-        Long views = viewsMap.get(event.getId());
+        Long views = viewsMap.getOrDefault(event.getId(), 0L);
 
         if (views == 0) views = 1L;
 
