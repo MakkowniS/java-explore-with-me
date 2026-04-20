@@ -338,8 +338,12 @@ public class EventServiceImpl implements EventService {
                 .map(event -> "/events/" + event.getId())
                 .collect(Collectors.toList());
 
-        LocalDateTime start = LocalDateTime.now().minusYears(10);
-        LocalDateTime end = LocalDateTime.now().plusMinutes(1);
+        LocalDateTime start = events.stream()
+                .map(Event::getPublishedOn)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(LocalDateTime.now());
+        LocalDateTime end = LocalDateTime.now();
         Map<Long, Long> viewsMap = new HashMap<>(); // <eventId, кол-во просмотров>
 
         try {
