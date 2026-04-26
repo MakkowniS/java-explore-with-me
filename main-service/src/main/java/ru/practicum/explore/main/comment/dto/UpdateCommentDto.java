@@ -9,10 +9,10 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewCommentDto {
+public class UpdateCommentDto {
 
     private Long userId;
-    private Long eventId;
+    private Long commentId;
 
     @NotBlank(message = "Комментарий не может быть пустым")
     @Size(min = 2, max = 2000, message = "Длина комментария должна быть от 2 до 2000 символов")

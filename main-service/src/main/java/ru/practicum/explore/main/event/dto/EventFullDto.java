@@ -53,4 +53,6 @@ public class EventFullDto {
 
     private Long views;
 
+    private Long comments;
+
 }

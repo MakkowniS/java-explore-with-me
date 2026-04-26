@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore.main.comment.dto.CommentDto;
 import ru.practicum.explore.main.comment.dto.NewCommentDto;
+import ru.practicum.explore.main.comment.dto.UpdateCommentDto;
 import ru.practicum.explore.main.comment.model.Comment;
 import ru.practicum.explore.main.comment.model.CommentState;
 import ru.practicum.explore.main.error.model.exception.ConflictException;
@@ -36,11 +37,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto addComment(Long userId, Long eventId, NewCommentDto dto) {
-        User author = userRepository.findById(userId)
+    public CommentDto addComment(NewCommentDto dto) {
+        User author = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-        Event event = eventRepository.findById(eventId)
+        Event event = eventRepository.findById(dto.getEventId())
                 .orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         if (!event.getState().equals(EventState.PUBLISHED)) {
@@ -48,22 +49,22 @@ public class CommentServiceImpl implements CommentService {
         }
 
         Comment comment = CommentMapper.mapToComment(dto, author, event);
-        log.info("Добавлен комментарий от пользователя {} для события {}", userId, eventId);
+        log.info("Добавлен комментарий от пользователя {} для события {}", author.getId(), event.getId());
         return CommentMapper.mapToCommentDto(commentRepository.save(comment));
     }
 
     @Override
     @Transactional
-    public CommentDto updateComment(Long userId, Long commentId, NewCommentDto dto) {
-        Comment comment = existComment(commentId);
+    public CommentDto updateComment(UpdateCommentDto dto) {
+        Comment comment = existComment(dto.getCommentId());
 
-        if (!comment.getAuthor().getId().equals(userId)) {
+        if (!comment.getAuthor().getId().equals(dto.getUserId())) {
             throw new ConflictException("Невозможно редактировать чужие комментарии");
         }
 
         comment.setText(dto.getText());
         comment.setState(CommentState.PUBLISHED);
-        log.info("Обновлён комментарий {} пользователем {}", commentId, userId);
+        log.info("Обновлён комментарий {} пользователем {}", comment.getId(), dto.getUserId());
         return CommentMapper.mapToCommentDto(commentRepository.save(comment));
     }
 

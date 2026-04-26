@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore.main.comment.CommentService;
 import ru.practicum.explore.main.comment.dto.CommentDto;
 import ru.practicum.explore.main.comment.dto.NewCommentDto;
+import ru.practicum.explore.main.comment.dto.UpdateCommentDto;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,16 +25,20 @@ public class PrivateCommentController {
     public CommentDto addComment(@PathVariable Long userId,
                                  @PathVariable Long eventId,
                                  @Valid @RequestBody NewCommentDto dto) {
+        dto.setUserId(userId);
+        dto.setEventId(eventId);
         log.info("Private: Создание комментария от пользователя {} для события {}", userId, eventId);
-        return commentService.addComment(userId, eventId, dto);
+        return commentService.addComment(dto);
     }
 
     @PatchMapping("/{commentId}")
     public CommentDto updateComment(@PathVariable Long userId,
                                     @PathVariable Long commentId,
-                                    @Valid @RequestBody NewCommentDto dto) {
+                                    @Valid @RequestBody UpdateCommentDto dto) {
+        dto.setUserId(userId);
+        dto.setCommentId(commentId);
         log.info("Private: Обновление комментария {} от пользователя {}", commentId, userId);
-        return commentService.updateComment(userId, commentId, dto);
+        return commentService.updateComment(dto);
     }
 
     @DeleteMapping("/{commentId}")

@@ -2,6 +2,7 @@ package ru.practicum.explore.main.comment;
 
 import ru.practicum.explore.main.comment.dto.CommentDto;
 import ru.practicum.explore.main.comment.dto.NewCommentDto;
+import ru.practicum.explore.main.comment.dto.UpdateCommentDto;
 import ru.practicum.explore.main.comment.model.CommentState;
 
 import java.util.List;
@@ -9,9 +10,9 @@ import java.util.List;
 public interface CommentService {
 
     // Private (User)
-    CommentDto addComment(Long userId, Long eventId, NewCommentDto dto);
+    CommentDto addComment(NewCommentDto dto);
 
-    CommentDto updateComment(Long userId, Long commentId, NewCommentDto dto);
+    CommentDto updateComment(UpdateCommentDto dto);
 
     List<CommentDto> getUserComments(Long userId, int from, int size);
 

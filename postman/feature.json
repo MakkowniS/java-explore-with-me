@@ -111,7 +111,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"annotation\": \"LoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsum\",\n  \"category\": {{catId}},\n  \"description\": \"LoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsum\",\n  \"eventDate\": \"2026-04-24 09:47:08\",\n  \"location\": {\n    \"lat\": 40.2987,\n    \"lon\": 81.1582\n  },\n  \"paid\": false,\n  \"participantLimit\": 100,\n  \"requestModeration\": false,\n  \"title\": \"ADSdhisahifdjasiaiaiai\"\n}",
+          "raw": "{\n  \"annotation\": \"LoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsum\",\n  \"category\": {{catId}},\n  \"description\": \"LoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsum\",\n  \"eventDate\": \"2026-04-30 09:47:08\",\n  \"location\": {\n    \"lat\": 40.2987,\n    \"lon\": 81.1582\n  },\n  \"paid\": false,\n  \"participantLimit\": 100,\n  \"requestModeration\": false,\n  \"title\": \"ADSdhisahifdjasiaiaiai\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -161,7 +161,7 @@
       "response": []
     },
     {
-      "name": "1. Private: Добавление комментария",
+      "name": "5. Private: Добавление комментария",
       "event": [
         {
           "listen": "test",
@@ -212,7 +212,7 @@
       "response": []
     },
     {
-      "name": "2. Public: Получение комментариев (не должно быть неодобренных)",
+      "name": "6. Public: Получение комментариев (не должно быть неодобренных)",
       "event": [
         {
           "listen": "test",
@@ -245,7 +245,7 @@
       "response": []
     },
     {
-      "name": "3. Admin: Модерация (одобрение)",
+      "name": "7. Admin: Модерация (одобрение)",
       "event": [
         {
           "listen": "test",
@@ -283,7 +283,7 @@
       "response": []
     },
     {
-      "name": "4. Private: Редактирование комментария",
+      "name": "8. Private: Редактирование комментария",
       "event": [
         {
           "listen": "test",
@@ -331,7 +331,41 @@
       "response": []
     },
     {
-      "name": "5. Private: Удаление комментария пользователем",
+      "name": "9. Public: Проверка поля comments в событии",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Поле comments присутствует\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('comments');",
+              "    pm.expect(jsonData.comments).to.be.a('number');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/events/{{eventId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            "{{eventId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10. Private: Удаление комментария пользователем",
       "event": [
         {
           "listen": "test",
@@ -366,7 +400,7 @@
       "response": []
     },
     {
-      "name": "6. Admin: Удаление комментария администратором (ожидаем 404, так как юзер уже удалил)",
+      "name": "11. Admin: Удаление комментария администратором (ожидаем 404, так как юзер уже удалил)",
       "event": [
         {
           "listen": "test",
